@@ -1,0 +1,180 @@
+.my-orders-wrapper {
+  max-width: 860px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.my-orders-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.my-orders-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.my-orders-count {
+  font-size: 0.8rem;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 999px;
+  padding: 0.2rem 0.75rem;
+  font-weight: 500;
+}
+
+/* Status messages */
+.my-orders-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 4rem 1rem;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.my-orders-error {
+  color: #dc2626;
+}
+
+/* Empty state */
+.my-orders-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.my-orders-empty i {
+  font-size: 2.5rem;
+  color: #cbd5e1;
+}
+
+.my-orders-empty p {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.my-orders-empty button {
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  background: #1e293b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.my-orders-empty button:hover {
+  background: #334155;
+}
+
+/* Table */
+.my-orders-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.my-orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.my-orders-table thead {
+  background: #f8fafc;
+}
+
+.my-orders-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.my-orders-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.my-orders-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.my-orders-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.my-orders-ref strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.my-orders-dash {
+  color: #94a3b8;
+}
+
+/* Badge état */
+.my-orders-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.my-orders-total {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.my-orders-date {
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Bouton action */
+.my-orders-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.9rem;
+  background: #1e293b;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.my-orders-action-btn:hover {
+  background: #334155;
+}
+
+/* Spinner */
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

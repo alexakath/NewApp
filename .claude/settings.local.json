@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-Content \"C:\\\\xampp\\\\apache\\\\logs\\\\error.log\" -Tail 50)",
+      "Bash(grep -n \"objectNodeName\\\\|objectsNodeName\" \"c:/xampp/htdocs/prestashop_edition_classic_version_8.2.6/classes/ObjectModel.php\" | head -20)",
+      "Read(//c/xampp/htdocs/prestashop_edition_classic_version_8.2.6/classes/**)",
+      "Bash(mysql -u root -e \"SHOW TABLES LIKE 'ps_stock%';\" prestashop_edition_classic_version_8)",
+      "Bash(mysql -u root -e \"SHOW TABLES LIKE 'ps_stock%';\" prestashop)"
+    ]
+  }
+}

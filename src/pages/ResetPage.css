@@ -1,0 +1,257 @@
+/* src/pages/ResetPage.css - Version Sobriété & Pro */
+
+.reset-page {
+  padding: 2rem;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.reset-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.8rem;
+  padding: 1.8rem 2rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+}
+
+.reset-header-icon {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.reset-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.reset-header p {
+  margin: 0.3rem 0 0 0;
+  color: #64748b;
+}
+
+/* === Grille des modules (meilleure position visuelle) === */
+.reset-modules-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+  gap: 1.4rem;
+  margin-bottom: 3rem;
+}
+
+/* Carte Module - Style plus doux */
+.reset-module-item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.reset-module-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.08);
+}
+
+.reset-module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.reset-module-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
+  flex: 1;
+}
+
+.reset-checkbox {
+  width: 23px;
+  height: 23px;
+  margin-top: 3px;
+  accent-color: #64748b;
+}
+
+.reset-module-title {
+  font-size: 1.12rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-top: 2px;
+}
+
+.reset-count-badge {
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.88rem;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  margin-left: 10px;
+}
+
+/* Sous-entités plus discrètes */
+.reset-sub-entities {
+  margin-top: 1.3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.sub-entities-title {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+}
+
+.sub-entity-row {
+  padding: 7px 10px;
+  border-radius: 8px;
+}
+
+.sub-entity-row:hover {
+  background: #f8fafc;
+}
+
+/* === Récapitulatif === */
+/* ====================== TABLEAU RÉCAPITULATIF ====================== */
+
+.reset-summary {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.reset-summary h3 {
+  margin: 0 0 1.4rem 0;
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Tableau amélioré */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.summary-table thead {
+  background: #f8fafc;
+}
+
+.summary-table th {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.summary-table td {
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 1rem;
+}
+
+.summary-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Style des lignes */
+.summary-table tbody tr:hover {
+  background: #f8fafc;
+  transition: background 0.2s;
+}
+
+/* Mise en valeur de la première colonne */
+.summary-table td:first-child {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Colonne quantité */
+.summary-table td:nth-child(2) {
+  font-weight: 600;
+  color: #1e40af;
+  width: 140px;
+}
+
+/* Style pour les sous-entités */
+.summary-table td:last-child {
+  color: #64748b;
+  font-size: 0.97rem;
+}
+
+/* Si aucune sous-entité */
+.summary-table .no-sub {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Bouton principal - Rouge plus doux */
+.reset-all-section {
+  text-align: center;
+  margin: 3rem 0 2rem;
+}
+
+.btn-delete-all {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 1rem 2.8rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.25s;
+}
+
+.btn-delete-all:hover:not(:disabled) {
+  background: #b91c1c;
+  transform: translateY(-2px);
+}
+
+/* Confirmation */
+.confirm-box {
+  background: #fff;
+  border: 2px solid #f87171;
+  border-radius: 16px;
+  padding: 2.5rem;
+  max-width: 580px;
+  margin: 2rem auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-box h3 {
+  color: #b91c1c;
+}
+
+/* Status badges plus discrets */
+.status-badge {
+  padding: 6px 13px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-badge.loading { background: #fef9c3; color: #ca8a04; }
+.status-badge.success { background: #ecfdf5; color: #10b981; }
+.status-badge.error   { background: #fef2f2; color: #ef4444; }

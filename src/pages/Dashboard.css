@@ -1,0 +1,443 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Loading / error */
+.dash-loading,
+.dash-error {
+  font-size: 13px;
+  color: #94a3b8;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* ── Finance grid (3 colonnes) ── */
+.finance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.finance-col {
+  background: #ffffff;
+  border: 0.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.finance-col-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.finance-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.finance-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+.finance-col-green  { border-top: 3px solid #22c55e; }
+.finance-col-amber  { border-top: 3px solid #f59e0b; }
+.finance-col-indigo { border-top: 3px solid #6366f1; }
+.finance-col-blue   { border-top: 3px solid #3b82f6; }
+.finance-col-pink   { border-top: 3px solid #c5568c; }
+.finance-col-green  .finance-col-title { color: #166534; }
+.finance-col-amber  .finance-col-title { color: #92400e; }
+.finance-col-indigo .finance-col-title { color: #4338ca; }
+.finance-col-blue   .finance-col-title { color: #1e40af; }
+.finance-col-pink  .finance-col-title { color: #c5568c; }
+
+
+.finance-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.finance-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.finance-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.finance-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.finance-count {
+  font-size: 20px;
+}
+
+/* ── Stats grid (conservé pour compatibilité) ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 0.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  cursor: default;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+
+.stat-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.stat-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.stat-blue   .stat-icon { background: #eff6ff; color: #3b82f6; }
+.stat-green  .stat-icon { background: #f0fdf4; color: #22c55e; }
+.stat-amber  .stat-icon { background: #fffbeb; color: #f59e0b; }
+.stat-red    .stat-icon { background: #fef2f2; color: #ef4444; }
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+/* ── Row principale ── */
+.dashboard-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ── Cards ── */
+.dash-card {
+  background: #ffffff;
+  border: 0.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.dash-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.dash-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+}
+
+.dash-card-title i { font-size: 15px; color: #64748b; }
+
+.dash-card-link {
+  font-size: 12px;
+  font-weight: 500;
+  color: #3b82f6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.dash-card-link:hover { color: #2563eb; }
+
+.dash-card-header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.day-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 0.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+
+.day-filter i {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.dash-empty {
+  font-size: 13px;
+  color: #94a3b8;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+/* ── Card aujourd'hui ── */
+.today-card {
+  border-color: #bfdbfe;
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 60%);
+}
+
+.today-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.today-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #3b82f6;
+  margin: 0 0 2px 0;
+}
+
+.today-date {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0;
+}
+
+.today-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #dbeafe;
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.today-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #ffffff;
+  border: 0.5px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 4px;
+}
+
+.today-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.today-stat-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.today-stat-lbl {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+.today-stat-divider {
+  width: 1px;
+  height: 32px;
+  background: #e2e8f0;
+}
+
+/* ── Mini table ── */
+.dash-mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.dash-mini-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 0.5px solid #f1f5f9;
+}
+
+.dash-mini-table td {
+  padding: 8px 8px;
+  color: #0f172a;
+  border-bottom: 0.5px solid #f8fafc;
+  vertical-align: middle;
+}
+
+.dash-mini-table tr:last-child td { border-bottom: none; }
+.dash-mini-table tr:hover td      { background: #f8fafc; }
+.dash-mini-table .price           { font-weight: 600; color: #0f172a; }
+.dash-mini-table .muted           { color: #64748b; }
+
+/* Ligne aujourd'hui dans le tableau par jour */
+.row-today td {
+  background: #eff6ff;
+  font-weight: 500;
+}
+
+.today-pill {
+  display: inline-block;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+
+/* Total row */
+.total-row td {
+  border-top: 1px solid #e2e8f0;
+  border-bottom: none !important;
+  background: #f8fafc;
+  padding: 10px 8px;
+}
+
+/* Count badge */
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* State badge */
+.order-state-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Recherche par date ── */
+.date-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 0.5px solid #e2e8f0;
+  border-radius: 9px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  width: fit-content;
+}
+
+.date-search-bar i {
+  font-size: 15px;
+  color: #94a3b8;
+}
+
+.date-input {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+}
+
+.date-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 14px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.date-clear:hover { color: #ef4444; }
+
+.search-result-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.search-total {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* ── Profit cards ── */
+.finance-col-teal        { border-top: 3px solid #0d9488; }
+.finance-col-rose        { border-top: 3px solid #f43f5e; }
+.finance-col-profit-pos  { border-top: 3px solid #16a34a; }
+.finance-col-profit-neg  { border-top: 3px solid #dc2626; }
+
+.finance-col-teal       .finance-col-title { color: #0f766e; }
+.finance-col-rose       .finance-col-title { color: #be123c; }
+.finance-col-profit-pos .finance-col-title { color: #15803d; }
+.finance-col-profit-neg .finance-col-title { color: #b91c1c; }
+
+.profit-pos { color: #16a34a !important; }
+.profit-neg { color: #dc2626 !important; }

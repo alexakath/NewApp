@@ -1,0 +1,155 @@
+.stock-history-page .muted {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+/* Header avec bouton retour */
+.history-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 0.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.back-btn:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.back-btn i {
+  font-size: 16px;
+}
+
+.history-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-title-wrap h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.history-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.88rem;
+  color: #334155;
+}
+
+/* Toolbar */
+.history-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.history-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.summary-entry {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.summary-exit {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.period-filter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.period-filter i {
+  position: absolute;
+  left: 11px;
+  color: #94a3b8;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.period-filter select {
+  padding: 8px 30px 8px 34px;
+  font-size: 0.85rem;
+  border: 0.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #0f172a;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.period-filter select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* Badges entrée/sortie */
+.mvt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.mvt-badge i {
+  font-size: 12px;
+}
+
+.mvt-in {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 0.5px solid #bbf7d0;
+}
+
+.mvt-out {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 0.5px solid #fecaca;
+}
+
+.qty-positive {
+  font-weight: 700;
+  color: #16a34a;
+  font-size: 14px;
+}
+
+.qty-negative {
+  font-weight: 700;
+  color: #dc2626;
+  font-size: 14px;
+}

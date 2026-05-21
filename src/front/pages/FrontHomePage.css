@@ -1,0 +1,224 @@
+.home-header {
+  margin-bottom: 2rem;
+}
+
+.home-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  margin: 0 0 4px 0;
+}
+
+.home-sub {
+  font-size: 0.875rem;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.home-status {
+  text-align: center;
+  color: var(--text-muted);
+  margin-top: 3rem;
+  font-size: 14px;
+}
+
+.home-error { color: var(--red); }
+
+/* Grid */
+.home-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Card */
+.home-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  justify-content: space-between;
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+}
+
+.home-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+  border-color: #cbd5e1;
+}
+
+/* Avatar */
+.home-card-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+  font-family: var(--font-mono);
+}
+
+/* Infos */
+.home-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.home-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-card-email {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-card-date {
+  font-size: 11.5px;
+  color: var(--text-light);
+  margin: 0;
+}
+
+/* Bouton — poussé à droite par justify-content: space-between sur la card */
+.home-card-btn {
+  height: 34px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: auto;
+  font-family: var(--font);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.home-card-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Hero */
+.home-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem 2.5rem;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.home-hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-shop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 9px 20px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  width: fit-content;
+  transition: background 0.15s;
+}
+
+.home-shop-btn:hover { background: var(--accent-dark); }
+
+.home-logged-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  padding: 5px 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.home-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 2px 0;
+  letter-spacing: -0.01em;
+}
+
+.home-section-sub {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.home-card-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.home-card-avatar-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.home-card-connected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  margin-left: 8px;
+}
+
+.home-card-btn-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.home-card-btn-active:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: #fff;
+}

@@ -19,14 +19,14 @@ const MODULE_ICONS = {
 }
 
 const MODULE_COLORS = {
-  products:     '#3b82f6',
-  categories:   '#8b5cf6',
+  products:     '#7c5cfc',
+  categories:   '#a78bfa',
   taxes:        '#f59e0b',
   combinations: '#06b6d4',
   stock:        '#10b981',
   customers:    '#ec4899',
   orders:       '#6366f1',
-  images:       '#64748b',
+  images:       '#6b7494',
 }
 
 const MODULE_LABELS = {
@@ -34,7 +34,6 @@ const MODULE_LABELS = {
   images: 'Images produits',
 }
 
-// importOrder global incluant les images en dernier
 const MODULE_ORDER = {
   taxes:        1,
   categories:   2,
@@ -46,7 +45,6 @@ const MODULE_ORDER = {
   images:       8,
 }
 
-// Dépendances inter-modules pour l'affichage du plan
 const MODULE_DEPS = {
   products:     ['taxes', 'categories'],
   combinations: ['products'],
@@ -64,20 +62,28 @@ const FileCard = ({ entry, onRemove, onDelimiterChange, disabled }) => {
       <div className="file-card">
         <div className="file-card-main">
           <div className="file-card-icon zip">
-            <i className="ti ti-file-zip"></i>
+            <i className="ti ti-file-zip" aria-hidden="true"></i>
           </div>
           <div className="file-card-info">
             <span className="file-card-name">{entry.file.name}</span>
             <div className="file-card-badges">
-              <span className="module-badge" style={{ background: '#64748b18', color: '#64748b', border: '0.5px solid #64748b44' }}>
-                <i className="ti ti-photo"></i> Images produits
+              <span
+                className="module-badge"
+                style={{
+                  background: '#6b749418',
+                  color: '#6b7494',
+                  border: '0.5px solid #6b749430',
+                }}
+              >
+                <i className="ti ti-photo" aria-hidden="true"></i>
+                Images produits
               </span>
             </div>
           </div>
         </div>
         {!disabled && (
-          <button className="file-card-remove" onClick={() => onRemove(entry.id)} title="Retirer ce fichier">
-            <i className="ti ti-x"></i>
+          <button className="file-card-remove" onClick={() => onRemove(entry.id)} title="Retirer ce fichier" aria-label="Retirer ce fichier">
+            <i className="ti ti-x" aria-hidden="true"></i>
           </button>
         )}
       </div>
@@ -88,7 +94,7 @@ const FileCard = ({ entry, onRemove, onDelimiterChange, disabled }) => {
     <div className="file-card">
       <div className="file-card-main">
         <div className="file-card-icon csv">
-          <i className="ti ti-file-text"></i>
+          <i className="ti ti-file-text" aria-hidden="true"></i>
         </div>
         <div className="file-card-info">
           <span className="file-card-name">{entry.file.name}</span>
@@ -103,10 +109,10 @@ const FileCard = ({ entry, onRemove, onDelimiterChange, disabled }) => {
                 style={{
                   background: `${MODULE_COLORS[mk]}18`,
                   color: MODULE_COLORS[mk],
-                  border: `0.5px solid ${MODULE_COLORS[mk]}44`,
+                  border: `0.5px solid ${MODULE_COLORS[mk]}40`,
                 }}
               >
-                <i className={`ti ${MODULE_ICONS[mk] || 'ti-database'}`}></i>
+                <i className={`ti ${MODULE_ICONS[mk] || 'ti-database'}`} aria-hidden="true"></i>
                 {MODULE_LABELS[mk]}
               </span>
             ))}
@@ -115,23 +121,22 @@ const FileCard = ({ entry, onRemove, onDelimiterChange, disabled }) => {
             )}
           </div>
 
-          {/* Résumé de validation */}
           {entry.validation && (
             <div className="file-validation">
               {entry.validation.errors.length === 0 && entry.validation.warnings.length === 0 ? (
                 <span className="val-ok">
-                  <i className="ti ti-circle-check"></i> Fichier valide
+                  <i className="ti ti-circle-check" aria-hidden="true"></i> Fichier valide
                 </span>
               ) : (
                 <>
                   {entry.validation.errors.map((err, i) => (
                     <span key={`e${i}`} className="val-error">
-                      <i className="ti ti-alert-circle"></i> {err.message}
+                      <i className="ti ti-alert-circle" aria-hidden="true"></i> {err.message}
                     </span>
                   ))}
                   {entry.validation.warnings.map((w, i) => (
                     <span key={`w${i}`} className="val-warning">
-                      <i className="ti ti-alert-triangle"></i> {w.message}
+                      <i className="ti ti-alert-triangle" aria-hidden="true"></i> {w.message}
                     </span>
                   ))}
                 </>
@@ -156,8 +161,8 @@ const FileCard = ({ entry, onRemove, onDelimiterChange, disabled }) => {
       </div>
 
       {!disabled && (
-        <button className="file-card-remove" onClick={() => onRemove(entry.id)} title="Retirer ce fichier">
-          <i className="ti ti-x"></i>
+        <button className="file-card-remove" onClick={() => onRemove(entry.id)} title="Retirer ce fichier" aria-label="Retirer ce fichier">
+          <i className="ti ti-x" aria-hidden="true"></i>
         </button>
       )}
     </div>
@@ -167,12 +172,13 @@ const FileCard = ({ entry, onRemove, onDelimiterChange, disabled }) => {
 // ─── Page principale ──────────────────────────────────────────────────────────
 
 const ImportPage = () => {
-  const [fileEntries, setFileEntries]   = useState([])
-  const [fileError, setFileError]       = useState(null)
-  const [importing, setImporting]       = useState(false)
+  const [fileEntries, setFileEntries]       = useState([])
+  const [fileError, setFileError]           = useState(null)
+  const [importing, setImporting]           = useState(false)
+  const [importImagesEnabled, setImportImagesEnabled] = useState(true)
   const [moduleProgress, setModuleProgress] = useState({})
-  const [moduleDone, setModuleDone]     = useState({})
-  const [globalReport, setGlobalReport] = useState(null)
+  const [moduleDone, setModuleDone]         = useState({})
+  const [globalReport, setGlobalReport]     = useState(null)
   const fileInputRef = useRef(null)
 
   // ── Ajout d'un fichier ──────────────────────────────────────────────────────
@@ -244,7 +250,6 @@ const ImportPage = () => {
   const csvEntries = fileEntries.filter(e => e.type === 'csv')
   const zipEntry   = fileEntries.find(e => e.type === 'zip') || null
 
-  // Tous les slots de modules, triés par importOrder global
   const plan = [
     ...csvEntries.flatMap(entry =>
       entry.selectedModules.map(mk => ({
@@ -253,10 +258,9 @@ const ImportPage = () => {
         fileId: entry.id,
       }))
     ),
-    ...(zipEntry ? [{ moduleKey: 'images', fileName: zipEntry.file.name, fileId: zipEntry.id }] : []),
+    ...(zipEntry && importImagesEnabled ? [{ moduleKey: 'images', fileName: zipEntry.file.name, fileId: zipEntry.id }] : []),
   ].sort((a, b) => (MODULE_ORDER[a.moduleKey] ?? 99) - (MODULE_ORDER[b.moduleKey] ?? 99))
 
-  // Map moduleKey → nom de fichier source (pour affichage des dépendances)
   const moduleFileMap = {}
   plan.forEach(s => { moduleFileMap[s.moduleKey] = s.fileName })
 
@@ -282,7 +286,7 @@ const ImportPage = () => {
     try {
       const report = await importMultiModule(
         csvPlan,
-        zipEntry?.file || null,
+        importImagesEnabled ? (zipEntry?.file || null) : null,
         (mk, pct) => setModuleProgress(prev => ({ ...prev, [mk]: pct })),
         (mk, results) => setModuleDone(prev => ({ ...prev, [mk]: results }))
       )
@@ -297,6 +301,7 @@ const ImportPage = () => {
   const handleReset = () => {
     setFileEntries([])
     setFileError(null)
+    setImportImagesEnabled(true)
     setModuleProgress({})
     setModuleDone({})
     setGlobalReport(null)
@@ -309,13 +314,10 @@ const ImportPage = () => {
     <div className="import-page">
 
       {/* En-tête */}
-      <div className="import-header">
-        <div className="import-header-icon">
-          <i className="ti ti-upload" aria-hidden="true"></i>
-        </div>
+      <div className="page-header">
         <div>
-          <h1>Import de données</h1>
-          <p>Ajoutez vos fichiers un par un — un seul bouton pour tout importer dans le bon ordre</p>
+          <h1 className="page-title">Import de données</h1>
+          <p className="page-subtitle">Ajoutez vos fichiers CSV et ZIP — un seul bouton pour tout importer dans le bon ordre</p>
         </div>
       </div>
 
@@ -345,6 +347,22 @@ const ImportPage = () => {
             />
           ))}
         </div>
+
+        {zipEntry && !globalReport && (
+          <div className="import-images-toggle" style={{ marginTop: '12px 0',padding: '10px', background: '#f8fafc', borderRadius: '6px',border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '8px', gap: '10px' }}>
+              <input
+                type="checkbox"
+                id="toggle-images"
+                checked={importImagesEnabled}
+                onChange={(e) => setImportImagesEnabled(e.target.checked)}
+                disabled={importing }
+                style={{width: '18px', height: '18px', cursor: 'pointer'}}
+              />
+              <label htmlFor="toggle-images" style={{fontWeight: '500', color: '#334155', cursor: 'pointer'}}>
+                Importer les images produits du ZIP
+              </label>
+            </div>
+        )}
 
         {!importing && !globalReport && (
           <button className="import-add-btn" onClick={() => fileInputRef.current?.click()}>
@@ -378,7 +396,7 @@ const ImportPage = () => {
             Plan d'import — {plan.length} module{plan.length > 1 ? 's' : ''}, dans cet ordre
           </div>
           <p className="import-plan-desc">
-            Un seul registre partagé : les IDs créés par un fichier sont disponibles pour les suivants.
+            Registre partagé : les IDs créés par un module sont injectés dans les suivants.
           </p>
           <div className="import-plan">
             {plan.map((slot, idx) => {
@@ -469,7 +487,7 @@ const ImportPage = () => {
                     style={{
                       width: done ? '100%' : `${pct}%`,
                       background: done
-                        ? (hasErrors ? '#f59e0b' : '#22c55e')
+                        ? (hasErrors ? 'var(--warn)' : 'var(--success)')
                         : undefined,
                     }}
                   />
@@ -490,7 +508,7 @@ const ImportPage = () => {
             </p>
           ) : (
             <>
-              <div className="report-summary all-success">
+              <div className="report-summary">
                 {Object.entries(globalReport).map(([mk, res]) => (
                   <div key={mk} className="report-stat">
                     <strong>{MODULE_LABELS[mk] || mk}</strong>
@@ -524,7 +542,7 @@ const ImportPage = () => {
             </>
           )}
 
-          <button className="btn-primary" onClick={handleReset} style={{ marginTop: '1.25rem' }}>
+          <button className="btn-primary" onClick={handleReset} style={{ marginTop: '16px' }}>
             <i className="ti ti-plus" aria-hidden="true"></i>
             Nouvel import
           </button>

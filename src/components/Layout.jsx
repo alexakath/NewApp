@@ -2,25 +2,23 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { logout, getCurrentUser } from '../api/services/authService'
 import './Layout.css'
 
-const NAV_ITEMS = [
+const NAV_SECTIONS = [
   {
     section: 'Catalogue',
+    icon: 'ti-layout-grid',
     items: [
-      { to: '/',             label: 'Dashboard',    icon: 'ti-layout-dashboard', exact: true },
-       { to: '/products',     label: 'Produits',     icon: 'ti-box' },
-      // { to: '/categories',   label: 'Catégories',   icon: 'ti-folder' },
-      // { to: '/combinations', label: 'Déclinaisons', icon: 'ti-adjustments' },
-      // { to: '/stock',        label: 'Stock',        icon: 'ti-package' },
-      // { to: '/customers',    label: 'Clients',      icon: 'ti-users' },
-      { to: '/stock',        label: 'Stock',        icon: 'ti-package' },
-      { to: '/orders',       label: 'Commandes',    icon: 'ti-clipboard-list' },
+      { to: '/',         label: 'Dashboard',    icon: 'ti-layout-dashboard', exact: true },
+      { to: '/products', label: 'Produits',      icon: 'ti-box' },
+      { to: '/stock',    label: 'Stock',         icon: 'ti-package' },
+      { to: '/orders',   label: 'Commandes',     icon: 'ti-clipboard-list' },
     ]
   },
   {
     section: 'Données',
+    icon: 'ti-database',
     items: [
-      { to: '/import', label: 'Import CSV',    icon: 'ti-upload' },
-      { to: '/reset',  label: 'Réinitialiser', icon: 'ti-refresh' },
+      { to: '/import', label: 'Import CSV',     icon: 'ti-upload' },
+      { to: '/reset',  label: 'Réinitialiser',  icon: 'ti-refresh' },
     ]
   }
 ]
@@ -35,92 +33,125 @@ const Layout = ({ children }) => {
     navigate('/login', { replace: true })
   }
 
-  const getTitle = () => {
+  /* ── Quelle section topnav est active ── */
+  const getActiveSection = () => {
+    for (const s of NAV_SECTIONS) {
+      for (const item of s.items) {
+        const match = item.exact
+          ? location.pathname === item.to
+          : location.pathname.startsWith(item.to) && item.to !== '/'
+        if (match || (item.exact && location.pathname === '/')) return s.section
+      }
+    }
+    return NAV_SECTIONS[0].section
+  }
+
+  const activeSection = getActiveSection()
+  const currentSection = NAV_SECTIONS.find(s => s.section === activeSection) || NAV_SECTIONS[0]
+
+  /* ── Breadcrumb label ── */
+  const getPageLabel = () => {
     const path = location.pathname
-    if (path === '/')             return 'Dashboard'
-    if (path === '/products')     return 'Produits'
-      // if (path === '/categories')   return 'Catégories'
-      // if (path === '/combinations') return 'Déclinaisons'
-      // if (path === '/stock')        return 'Stock'
-      // if (path === '/customers')    return 'Clients'
-    if (path === '/stock')        return 'Ajout de stock'
-    if (path.startsWith('/stock/history'))  return 'Historique des mouvements'
-    if (path === '/orders')       return 'Commandes'
-    if (path === '/import')       return 'Import CSV'
-    if (path === '/reset')        return 'Réinitialisation'
+    if (path === '/')                          return 'Dashboard'
+    if (path === '/products')                  return 'Produits'
+    if (path === '/stock')                     return 'Stock'
+    if (path.startsWith('/stock/history'))     return 'Historique des mouvements'
+    if (path === '/orders')                    return 'Commandes'
+    if (path === '/import')                    return 'Import CSV'
+    if (path === '/reset')                     return 'Réinitialisation'
     return 'NewApp'
   }
 
   return (
     <div className="layout">
 
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar-brand">
-          <div className="sidebar-brand-icon">
+      {/* ── Topnav ── */}
+      <header className="topnav">
+        <div className="tn-brand">
+          <div className="tn-brand-icon">
             <i className="ti ti-shopping-cart" aria-hidden="true"></i>
           </div>
-          <span className="sidebar-brand-name">New<span>App</span></span>
+          <span className="tn-brand-name">Your'<span>Store</span></span>
         </div>
 
-        <nav className="sidebar-nav">
-          {NAV_ITEMS.map((group) => (
-            <div key={group.section} className="nav-group">
-              <p className="nav-section">{group.section}</p>
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.exact}
-                  className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-                >
-                  <i className={`ti ${item.icon}`} aria-hidden="true"></i>
-                  <span>{item.label}</span>
-                </NavLink>
-              ))}
-            </div>
+        <nav className="tn-links">
+          {NAV_SECTIONS.map(s => (
+            <button
+              key={s.section}
+              className={`tn-link ${activeSection === s.section ? 'active' : ''}`}
+              onClick={() => navigate(s.items[0].to)}
+            >
+              <i className={`ti ${s.icon}`} aria-hidden="true"></i>
+              {s.section}
+            </button>
           ))}
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="nav-item">
-            <i className="ti ti-settings" aria-hidden="true"></i>
-            <span>New App</span>
+        <div className="tn-right">
+          <div className="tn-user">
+            <div className="tn-avatar">
+              {user?.firstname?.[0]}{user?.lastname?.[0]}
+            </div>
+            <span className="tn-username">
+              {user?.firstname} {user?.lastname}
+            </span>
           </div>
+          <button
+            className="tn-logout"
+            onClick={handleLogout}
+            title="Se déconnecter"
+            aria-label="Se déconnecter"
+          >
+            <i className="ti ti-logout" aria-hidden="true"></i>
+          </button>
         </div>
-      </aside>
+      </header>
 
-      {/* Main */}
-      <div className="main">
-        <header className="topbar">
-          <h1 className="topbar-title">{getTitle()}</h1>
-          <div className="topbar-right">
+      {/* ── Body row : subnav + content ── */}
+      <div className="body-row">
 
-            {/* User info + logout */}
-            <div className="topbar-user">
-              <div className="topbar-avatar">
-                {user?.firstname?.[0]}{user?.lastname?.[0]}
-              </div>
-              <span className="topbar-username">
-                {user?.firstname} {user?.lastname}
-              </span>
+        {/* ── Subnav latéral contextuel ── */}
+        <aside className="subnav">
+          <p className="sn-section-title">{currentSection.section}</p>
+          {currentSection.items.map(item => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.exact}
+              className={({ isActive }) => `sn-item ${isActive ? 'active' : ''}`}
+            >
+              <i className={`ti ${item.icon}`} aria-hidden="true"></i>
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </aside>
+
+        {/* ── Zone principale ── */}
+        <div className="main">
+
+          {/* ── Breadbar ── */}
+          <div className="breadbar">
+            <div className="breadcrumb">
+              <i className="ti ti-home" aria-hidden="true"></i>
+              <i className="ti ti-chevron-right" aria-hidden="true"></i>
+              <span className="bc-section">{currentSection.section}</span>
+              <i className="ti ti-chevron-right" aria-hidden="true"></i>
+              <span className="bc-current">{getPageLabel()}</span>
             </div>
 
-            <button
-              className="topbar-logout-btn"
-              onClick={handleLogout}
-              title="Se déconnecter"
-            >
-              <i className="ti ti-logout" aria-hidden="true"></i>
-            </button>
+            <div className="quickstats" id="quickstats">
+              {/* Les stats sont injectées dynamiquement depuis Dashboard ou via un contexte */}
+              {/* Pour l'instant on laisse vide — à brancher sur le contexte global si besoin */}
+            </div>
           </div>
-        </header>
 
-        <main className="content">
-          {children}
-        </main>
+          {/* ── Contenu de la page ── */}
+          <main className="content">
+            {children}
+          </main>
+
+        </div>
       </div>
-
     </div>
   )
 }

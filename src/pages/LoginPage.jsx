@@ -41,10 +41,10 @@ const LoginPage = () => {
           <div className="login-logo-icon">
             <i className="ti ti-shopping-cart" aria-hidden="true"></i>
           </div>
-          <span className="login-logo-name">New<span>App</span></span>
+          <span className="login-logo-name">Your'<span>Store</span></span>
         </div>
 
-        <h1 className="login-title">Connexion au backoffice</h1>
+        <h1 className="login-title">Connexion de l'administration</h1>
         <p className="login-sub">
           Connectez-vous avec votre compte PrestaShop
         </p>

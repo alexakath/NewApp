@@ -5,6 +5,11 @@
 
 @keyframes spin      { to { transform: rotate(360deg); } }
 @keyframes blink-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes reset-indeterminate {
+  0%   { transform: translateX(-100%); width: 35%; }
+  50%  { width: 55%; }
+  100% { transform: translateX(300%); width: 35%; }
+}
 
 /* ══════════════════════════════════════════
    CARTE MODULE
@@ -46,6 +51,16 @@
   background: var(--danger);
 }
 
+/* Sélectionné */
+.reset-module-item.is-selected {
+  border-color: #ef444328;
+  background: #1a0d0d;
+}
+
+.reset-module-item.is-selected::before {
+  background: var(--danger);
+}
+
 /* Forcé par cascade */
 .reset-module-item.is-forced {
   border-color: #f59e0b28;
@@ -53,7 +68,7 @@
 }
 
 .reset-module-item.is-forced::before {
-  background: var(--warn);
+  background: #f59e0b;
 }
 
 /* Non sélectionné — atténué */
@@ -126,7 +141,7 @@
 }
 
 .reset-module-item.is-forced .reset-checkbox:checked::after {
-  background: var(--warn);
+  background: #f59e0b;
 }
 
 .reset-checkbox:disabled {
@@ -188,7 +203,7 @@
 
 .expand-btn:hover {
   color: var(--text-secondary);
-  background: var(--bg-hover);
+  background: var(--bg-raised);
 }
 
 /* ══════════════════════════════════════════
@@ -199,7 +214,7 @@
   margin-left: 8px;
   padding: 2px 8px;
   background: #f59e0b18;
-  color: var(--warn);
+  color: #f59e0b;
   border: 0.5px solid #f59e0b35;
   border-radius: 999px;
   font-size: 10px;
@@ -212,7 +227,7 @@
   display: inline-block;
   padding: 2px 8px;
   background: #f59e0b18;
-  color: var(--warn);
+  color: #f59e0b;
   border: 0.5px solid #f59e0b30;
   border-radius: 999px;
   font-size: 10px;
@@ -238,7 +253,7 @@
 /* Loading — spinner intégré */
 .status-badge.loading {
   background: #f59e0b18;
-  color: var(--warn);
+  color: #f59e0b;
   border: 0.5px solid #f59e0b30;
 }
 
@@ -247,7 +262,7 @@
   width: 8px;
   height: 8px;
   border: 1.5px solid #f59e0b40;
-  border-top-color: var(--warn);
+  border-top-color: #f59e0b;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   flex-shrink: 0;
@@ -255,9 +270,9 @@
 
 /* Success — point clignotant */
 .status-badge.success {
-  background: var(--success-dim);
-  color: var(--success);
-  border: 0.5px solid #06b6d430;
+  background: rgba(74,222,128,0.08);
+  color: #4ade80;
+  border: 0.5px solid #4ade8030;
 }
 
 .status-badge.success::before {
@@ -265,7 +280,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--success);
+  background: #4ade80;
   animation: blink-dot 1.5s ease-in-out infinite;
   flex-shrink: 0;
 }
@@ -283,7 +298,7 @@
 .reset-sub-entities {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 0.5px solid var(--border-soft);
+  border-top: 0.5px solid var(--border);
 }
 
 .sub-entities-title {
@@ -314,7 +329,7 @@
 }
 
 .sub-entity-row:hover {
-  background: var(--bg-hover);
+  background: var(--bg-raised);
   color: var(--text-primary);
 }
 
@@ -335,4 +350,42 @@
   font-size: 11px;
   color: var(--text-muted);
   margin-left: 4px;
+}
+
+/* ══════════════════════════════════════════
+   BARRE DE PROGRESSION
+══════════════════════════════════════════ */
+.reset-progress-wrap {
+  margin-top: 10px;
+  height: 3px;
+  background: var(--bg-raised);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.reset-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease, background 0.3s;
+}
+
+/* En cours — barre indéterminée animée */
+.reset-progress-bar--running {
+  width: 35%;
+  background: #f59e0b;
+  animation: reset-indeterminate 1.4s ease-in-out infinite;
+}
+
+/* Succès — 100% vert */
+.reset-progress-bar--success {
+  width: 100%;
+  background: #4ade80;
+  box-shadow: 0 0 6px rgba(74,222,128,0.3);
+}
+
+/* Erreur — 100% rouge */
+.reset-progress-bar--error {
+  width: 100%;
+  background: var(--danger);
+  box-shadow: 0 0 6px rgba(239,68,68,0.3);
 }

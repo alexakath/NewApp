@@ -1,5 +1,6 @@
 import axiosInstance from '../axiosInstance'
 import { parseXML } from '../xmlParser'
+import { getStockAvailableRecord } from './stockMovementService'
 
 // IDs des états de commande PrestaShop
 // IN_CART est un état virtuel géré localement uniquement (pas de PUT vers PrestaShop)
@@ -282,4 +283,115 @@ const buildOrderXml = (order, newStateId, dateAddOverride) => {
     <reference>${getVal(order.reference)}</reference>
   </order>
 </prestashop>`
+}
+
+/**
+ * Crée un panier (cart) PrestaShop contenant les produits clonés
+ */
+export const createCart = async (customerId, addressId, carrierId, currencyId, products) => {
+  const now = new Date().toISOString().replace('T', ' ').substring(0, 19)
+
+  // Construction dynamique de la liste des produits en XML
+  const productsXml = products.map(p => `
+    <cart_row>
+      <id_product>${p.id_product}</id_product>
+      <id_product_attribute>${p.id_product_attribute || '0'}</id_product_attribute>
+      id_address_delivery>${addressId}</id_address_delivery>
+      <quantity>${p.quantity}</quantity>
+    </cart_row>`).join('')
+
+  const cartXml = `<?xml version="1.0" encoding="UTF-8"?>
+  <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+    <cart>
+      <id_billing_address>${addressId}</id_billing_address>
+      <id_shipping_address>${addressId}</id_shipping_address>
+      <id_currency>${currencyId}</id_currency>
+      <id_customer>${customerId}</id_customer>
+      <id_lang>1</id_lang>
+      <id_carrier>${carrierId}</id_carrier>
+      <recyclable>0</recyclable>
+      <gift>0</gift>
+      <gift_message></gift_message>
+      <mobile_theme>0</mobile_theme>
+      <delivery_option></delivery_option>
+      <secure_key></secure_key>
+      <allow_seperated_package>0</allow_seperated_package>
+      <date_add>${now}</date_add>
+      <date_upd>${now}</date_upd>
+      <associations>
+        <cart_rows>
+          ${cartRowsXml}
+        </cart_rows>
+      </associations>
+    </cart>
+  </prestashop>`
+
+  const response = await axiosInstance.post('/carts', cartXml, {
+    headers: { 'Content-Type': 'application/xml' },
+  })
+  const result = parseXML(response.data)
+  return result?.prestashop?.cart
+}
+
+/**
+ * ALÉA 2 : Duplication de commande avec vérification stricte des stocks
+ */
+export const duplicateOrderWithMultiplier = async (orderId, multiplier) => {
+  // Récupérer la commande d'origine
+  const current = await getOrderById(orderId)
+  const order = current?.prestashop?.order
+  if (!order) throw new Error(`Commande #${orderId} introuvable pour duplication`)
+    // Extraction des lignes de produits
+  const rawRows = order.associations?.order_rows?.order_row
+  if (!rawRows) throw new Error(`La commande #${orderId} n'a pas de lignes de produits à dupliquer`)
+  const orderRows = Array.isArray(rawRows) ? rawRows : [rawRows]
+
+  // Vérification des stocks pour chaque produit
+  for (const row of orderRows) {
+    const productId = getVal(row.product_id)
+    const productAttributeId = getVal(row.product_attribute_id) || '0'
+    const requestQty = parseInt(getVal(row.product_quantity)) * multiplier
+    // Appel de ton stockMouvementService
+    const stockItem = await getStockAvailableRecord(productId, productAttributeId)
+
+    if (!stockItem) {
+      throw new Error(`Impossible de vérifier les stocks pour le produits ID ${productId}`)
+    }
+
+    const availableQty = parseInt(getVal(stockItem.quantity), 10)
+    if (availableQty < requestQty) {
+      throw new Error(`Stock insuffisant pour le produit "${getVal(row.product_name)}" (ID ${productId}). Disponible: ${availableQty}, requis: ${requestQty}`)
+    }
+  }
+  
+  // Si tous les produits ont suffisamment de stock, procéder à la duplication
+  // 3. Préparer les données pour le panier de transition
+  const customerId = getVal(order.id_customer)
+  const addressId = getVal(order.id_address_delivery) 
+  const carrierId = getVal(order.id_carrier)
+  const currencyId = getVal(order.id_currency)
+
+  const clonedProducts = orderRows.map(row => ({
+    id_product: getVal(row.product_id),
+    id_product_attribute: getVal(row.product_attribute_id) || '0',
+    quantity: parseInt(getVal(row.product_quantity), 10) * multiplier
+  }))
+
+  // 4. Créer le panier temporaire dans PrestaShop
+  const newcart = await createCart(customerId, addressId, carrierId, currencyId, clonedProducts)
+  const rawCartId = getVal(newcart?.id)
+
+  if (!rawCartId) throw new Error('Échec de la création du panier pour la duplication de commande')
+  
+  // 5. Convertir ce panier en commande payée
+  const dummyCartItem = {
+    rawCartId,
+    customerId,
+    addressId,
+    carrierId,
+    currencyId,
+    cartSecureKey: getVal(newcart.secure_key)
+  }
+  const newOrderId = await createOrderFromCart(dummyCartItem)
+  return newOrderId
 }

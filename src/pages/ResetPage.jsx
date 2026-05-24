@@ -185,10 +185,14 @@ const ResetPage = () => {
               onModuleToggle={handleModuleToggle}
               onSubToggle={handleSubToggle}
               status={statusPerModule[key]}
+              isDeleting={isDeleting}
             />
           )
         })}
       </div>
+
+      {/* Panneau droit : récap + action */}
+      <div className="reset-right-panel">
 
       {/* Tableau récapitulatif */}
       <div className="reset-summary">
@@ -230,7 +234,7 @@ const ResetPage = () => {
       <div className="reset-all-section">
         {!showConfirm ? (
           <button
-            className="btn-delete-all"
+            className={`btn-delete-all${isDeleting ? ' btn-delete-all--running' : ''}`}
             onClick={() => setShowConfirm(true)}
             disabled={isDeleting || totalToDelete === 0}
           >
@@ -242,7 +246,7 @@ const ResetPage = () => {
           </button>
         ) : (
           <div className="confirm-box">
-            <h3>⚠️ Confirmation finale</h3>
+            <h3><i className="ti ti-alert-triangle" aria-hidden="true"></i> Confirmation finale</h3>
             <p>
               Cette action est <strong>irréversible</strong>.<br />
               Voulez-vous vraiment supprimer les données sélectionnées ?
@@ -263,19 +267,21 @@ const ResetPage = () => {
         )}
       </div>
 
+      </div>{/* fin reset-right-panel */}
+
       {/* Résultat final */}
       {result && (
         <div className="reset-result">
           <h3>Résultat de l'opération</h3>
           {result.success.length > 0 && (
             <div className="success-list">
-              <strong>✅ Supprimés avec succès :</strong>
+              <strong>Supprimés avec succès :</strong>
               <ul>{result.success.map((s) => <li key={s.module}>{s.label}</li>)}</ul>
             </div>
           )}
           {result.errors.length > 0 && (
             <div className="error-list">
-              <strong>❌ Erreurs :</strong>
+              <strong>Erreurs :</strong>
               <ul>{result.errors.map((e) => <li key={e.module}>{e.label} — {e.error}</li>)}</ul>
             </div>
           )}

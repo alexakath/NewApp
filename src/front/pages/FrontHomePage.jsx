@@ -151,7 +151,7 @@ const FrontHomePage = () => {
                   className={`home-card-btn ${isCurrentUser ? 'home-card-btn-active' : ''}`}
                   onClick={() => handleAccess(c)}
                 >
-                  {isCurrentUser ? 'Continuer →' : isAnon ? 'Accéder et commander' : 'Accéder'}
+                  {isCurrentUser ? 'Continuer →' : isAnon ? 'Accéder et commander' : 'se connecter'}
                 </button>
               </div>
             )

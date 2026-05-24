@@ -7,12 +7,13 @@ const ResetModuleItem = ({
   count,
   subEntities   = {},
   selected      = true,
-  forced        = false,   // ce module est imposé par une dépendance cascade
-  forcedBy      = [],      // labels des modules qui l'imposent
+  forced        = false,
+  forcedBy      = [],
   selectedSub   = {},
   onModuleToggle,
   onSubToggle,
   status        = null,    // 'loading' | 'success' | 'error'
+  isDeleting    = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -20,13 +21,15 @@ const ResetModuleItem = ({
 
   const getStatusBadge = () => {
     if (status === 'loading') return <span className="status-badge loading">Suppression en cours...</span>
-    if (status === 'success') return <span className="status-badge success">✅ Supprimé</span>
-    if (status === 'error')   return <span className="status-badge error">❌ Erreur</span>
+    if (status === 'success') return <span className="status-badge success">Supprimé</span>
+    if (status === 'error')   return <span className="status-badge error">Erreur</span>
     return null
   }
 
+  const progressState = status || (isDeleting && selected ? 'running' : null)
+
   return (
-    <div className={`reset-module-item ${forced ? 'is-forced' : ''} ${!selected ? 'is-unselected' : ''}`}>
+    <div className={`reset-module-item ${forced ? 'is-forced' : (selected ? 'is-selected' : 'is-unselected')}`}>
       <div className="reset-module-header">
         <div className="reset-module-left">
           <input
@@ -66,6 +69,12 @@ const ResetModuleItem = ({
           )}
         </div>
       </div>
+
+      {progressState && (
+        <div className="reset-progress-wrap">
+          <div className={`reset-progress-bar reset-progress-bar--${progressState}`} />
+        </div>
+      )}
 
       {isExpanded && hasSubEntities && (
         <div className="reset-sub-entities">

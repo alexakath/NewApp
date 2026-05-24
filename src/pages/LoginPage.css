@@ -13,7 +13,7 @@
   --text-primary:   #dde1f0;
   --text-secondary: #6b7494;
   --text-muted:     #323756;
-  --text-faint:     #1e2438;
+  --text-faint:     #3a4060;
   --danger:         #ef4444;
   --danger-dim:     #ef444418;
 }
@@ -35,6 +35,9 @@
   justify-content: center;
   padding: 40px 24px;
   background: var(--bg-base);
+  background-image:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(124,92,252,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 75%, rgba(124,92,252,0.04) 0%, transparent 55%);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -52,7 +55,7 @@
   border-radius: 16px;
   overflow: hidden;
   border: 0.5px solid var(--border);
-  box-shadow: 0 0 0 1px #ffffff04, 0 24px 48px #00000060;
+  box-shadow: 0 0 0 1px #ffffff04, 0 24px 64px #00000070, 0 0 0 1px rgba(124,92,252,0.04);
 }
 
 /* ══════════════════════════════════════════
@@ -107,6 +110,7 @@
   color: var(--accent);
   font-size: 18px;
   flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(124,92,252,0.15);
 }
 
 .login-logo-name {
@@ -316,6 +320,7 @@
   margin-top: 4px;
   transition: opacity 0.15s, transform 0.1s;
   letter-spacing: 0.01em;
+  box-shadow: 0 4px 14px rgba(124,92,252,0.25);
 }
 
 .login-btn:hover:not(:disabled) {
@@ -336,7 +341,7 @@
 }
 
 .login-form::after {
-  content: '🔒  Authentification sécurisée via l\'API PrestaShop';
+  content: 'Authentification sécurisée via l\'API PrestaShop';
   font-size: 11px;
   color: var(--text-faint);
   text-align: center;

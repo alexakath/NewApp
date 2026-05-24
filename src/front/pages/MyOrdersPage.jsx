@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import FrontLayout from '../FrontLayout'
 import { frontIsAuthenticated, frontGetCurrentUser } from '../services/frontAuthService'
 import useMyOrders from '../hooks/useMyOrders'
+import { duplicateOrderWithMultiplier } from '../../api/services/ordersService'
 import './MyOrdersPage.css'
 
 const MyOrdersPage = () => {
@@ -28,7 +30,12 @@ const MyOrdersPage = () => {
 }
 
 const MyOrdersContent = ({ user, navigate }) => {
-  const { orders, loading, error } = useMyOrders(user?.id)
+  const { orders, loading, error, refreshOrders } = useMyOrders(user?.id)
+  
+  // États locaux pour l'actionneur de duplication
+  const [multipliers, setMultipliers] = useState({}) 
+  const [processingId, setProcessingId] = useState(null) 
+  const [actionMessage, setActionMessage] = useState({ text: '', isError: false })
 
   if (loading) {
     return (
@@ -48,6 +55,38 @@ const MyOrdersContent = ({ user, navigate }) => {
     )
   }
 
+  const handleMultiplierChange = (orderId, val) => {
+    const num = Math.max(1, Math.min(100, parseInt(val, 10) || 1))
+    setMultipliers(prev => ({ ...prev, [orderId]: num }))
+  }
+
+  const handleReorder = async (orderId) => {
+    const coeff = multipliers[orderId] || 1
+    setProcessingId(orderId)
+    setActionMessage({ text: '', isError: false })
+
+    try {
+      const newId = await duplicateOrderWithMultiplier(orderId, coeff)
+      setActionMessage({ 
+        text: `Succès ! La commande #${orderId} a été clonée. Nouvelle commande : #${newId}`, 
+        isError: false 
+      })
+      
+      if (typeof refreshOrders === 'function') {
+        refreshOrders()
+      } else {
+        setTimeout(() => window.location.reload(), 2000)
+      }
+    } catch (err) {
+      setActionMessage({ 
+        text: `Échec du clonage : ${err.message}`, 
+        isError: true 
+      })
+    } finally {
+      setProcessingId(null)
+    }
+  }
+
   return (
     <div className="my-orders-wrapper">
       <div className="my-orders-header">
@@ -58,6 +97,14 @@ const MyOrdersContent = ({ user, navigate }) => {
           </span>
         )}
       </div>
+
+      {/* Message de Notification Dynamique */}
+      {actionMessage.text && (
+        <div className={`action-msg ${actionMessage.isError ? 'action-msg-error' : 'action-msg-success'}`}>
+          <i className={`ti ${actionMessage.isError ? 'ti-circle-x' : 'ti-circle-check'}`}></i>
+          <span>{actionMessage.text}</span>
+        </div>
+      )}
 
       {orders.length === 0 ? (
         <div className="my-orders-empty">
@@ -74,47 +121,90 @@ const MyOrdersContent = ({ user, navigate }) => {
                 <th>État</th>
                 <th>Total TTC</th>
                 <th>Date</th>
-                <th></th>
+                <th style={{ textAlign: 'right' }}>Actions / Multiplicateur</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((item) => (
-                <tr key={item.id}>
-                  <td className="my-orders-ref">
-                    {item.reference !== '—'
-                      ? <strong>{item.reference}</strong>
-                      : <span className="my-orders-dash">—</span>
-                    }
-                  </td>
-                  <td>
-                    <span
-                      className="my-orders-badge"
-                      style={{
-                        background: `${item.stateColor}22`,
-                        color:      item.stateColor,
-                        border:     `0.5px solid ${item.stateColor}55`,
-                      }}
-                    >
-                      {item.state}
-                    </span>
-                  </td>
-                  <td className="my-orders-total">
-                    {item.totalTTC !== '0.00' ? `${item.totalTTC} €` : '—'}
-                  </td>
-                  <td className="my-orders-date">{item.dateAdd}</td>
-                  <td>
-                    {(item.type === 'cart' || (item.state || '').toLowerCase() === 'dans le panier') && (
-                      <button
-                        className="my-orders-action-btn"
-                        onClick={() => navigate('/shop/cart')}
+              {orders.map((item) => {
+                const currentCoeff = multipliers[item.id] || 1
+                const isCurrentProcessing = processingId === item.id
+                const isCart = item.type === 'cart' || (item.state || '').toLowerCase() === 'dans le panier'
+
+                return (
+                  <tr key={item.id}>
+                    <td className="my-orders-ref">
+                      {item.reference !== '—'
+                        ? <strong>{item.reference}</strong>
+                        : <span className="my-orders-dash">—</span>
+                      }
+                    </td>
+                    <td>
+                      <span
+                        className="my-orders-badge"
+                        style={{
+                          background: `${item.stateColor}22`,
+                          color:      item.stateColor,
+                          border:     `0.5px solid ${item.stateColor}55`,
+                        }}
                       >
-                        <i className="ti ti-shopping-cart"></i>
-                        Finaliser
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                        {item.state}
+                      </span>
+                    </td>
+                    <td className="my-orders-total">
+                      {item.totalTTC !== '0.00' ? `${item.totalTTC} €` : '—'}
+                    </td>
+                    <td className="my-orders-date">{item.dateAdd}</td>
+                    
+                    {/* Actions alignées à droite */}
+                    <td className="my-orders-actions-cell">
+                      {isCart ? (
+                        <button
+                          className="my-orders-action-btn"
+                          onClick={() => navigate('/shop/cart')}
+                        >
+                          <i className="ti ti-shopping-cart"></i>
+                          Finaliser
+                        </button>
+                      ) : (
+                        <div className="my-orders-actions-inner">
+                          {/* Sélecteur de quantité */}
+                          <div className="my-orders-multiplier">
+                            <span className="my-orders-multiplier-x">x</span>
+                            <input
+                              type="number"
+                              min="1"
+                              max="100"
+                              value={currentCoeff}
+                              onChange={(e) => handleMultiplierChange(item.id, e.target.value)}
+                              disabled={!!processingId}
+                              className="my-orders-multiplier-input"
+                            />
+                          </div>
+
+                          {/* Bouton d'action */}
+                          <button
+                            className={`my-orders-action-btn my-orders-reorder-btn${processingId ? ' processing' : ''}`}
+                            disabled={!!processingId}
+                            onClick={() => handleReorder(item.id)}
+                          >
+                            {isCurrentProcessing ? (
+                              <>
+                                <i className="ti ti-loader-2 spin"></i>
+                                Vérification...
+                              </>
+                            ) : (
+                              <>
+                                <i className="ti ti-copy"></i>
+                                Recommander
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

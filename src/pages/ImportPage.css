@@ -22,7 +22,7 @@
 ══════════════════════════════════════════ */
 .import-body {
   display: grid;
-  grid-template-columns: 1fr 244px;
+  grid-template-columns: minmax(0, 400px) 244px;
   gap: 12px;
   align-items: start;
 }
@@ -37,7 +37,7 @@
 /* ── Fallback : si pas de .import-body wrapper,
    on simule via les sections directes ── */
 .import-page > .import-section {
-  max-width: 100%;
+  max-width: 50%;
 }
 
 /* ══════════════════════════════════════════
@@ -49,6 +49,7 @@
   border-radius: 12px;
   padding: 16px 18px;
   margin-bottom: 10px;
+  
 }
 
 .import-section:last-child {
@@ -547,7 +548,7 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  width: 100%;
+  width: 50%;
   padding: 9px 16px;
   background: var(--accent);
   color: #fff;

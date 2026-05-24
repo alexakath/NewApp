@@ -133,13 +133,20 @@ const useEnrichedOrders = () => {
         })
 
         const productCountMap = {}
+        const productsByOrderMap = {}
         rawOrderDetails.forEach((d) => {
           const orderId = String(getVal(d.id_order))
           const qty = parseInt(getVal(d.product_quantity) || 1)
           productCountMap[orderId] = (productCountMap[orderId] || 0) + qty
+          if (!productsByOrderMap[orderId]) productsByOrderMap[orderId] = []
+          productsByOrderMap[orderId].push({
+            name: String(getVal(d.product_name) || '—'),
+            qty,
+          })
         })
 
         const productPriceMap = {}
+        const productNameMap = {}
         rawProducts.forEach((p) => {
           const id      = String(getVal(p.id))
           const priceHT = parseFloat(getVal(p.price) || 0)
@@ -149,6 +156,12 @@ const useEnrichedOrders = () => {
             priceHT,
             priceTTC: priceHT * (1 + taxRate / 100),
           }
+          const lang = p.name?.language
+          productNameMap[id] = typeof lang === 'string'
+            ? lang
+            : (lang?.['#text'] != null ? String(lang['#text']) : null)
+              ?? (Array.isArray(lang) && lang[0]?.['#text'] != null ? String(lang[0]['#text']) : null)
+              ?? '—'
         })
 
         const enrichedOrders = rawOrders.map((order) => {
@@ -181,6 +194,7 @@ const useEnrichedOrders = () => {
             totalHT: totalHT.toFixed(2),
             totalTTC: totalTTC.toFixed(2),
             productCount: productCountMap[id] || 0,
+            products: productsByOrderMap[id] || [],
             dateAdd: getVal(order.date_add)?.split(' ')[0] || '—',
             dateUpd: getVal(order.date_upd)?.split(' ')[0] || '—',
             raw: { ...order, associations: { ...order.associations, order_rows: { order_row: enrichedOrderRows } } },
@@ -237,6 +251,9 @@ const useEnrichedOrders = () => {
               totalHT: totalHT.toFixed(2),
               totalTTC: totalTTC.toFixed(2),
               productCount: rows.reduce((sum, row) => sum + parseInt(getVal(row.quantity) || 0), 0),
+              products: rows
+                .map(row => ({ name: productNameMap[String(getVal(row.id_product))] || '—', qty: parseInt(getVal(row.quantity) || 0) }))
+                .filter(p => p.qty > 0),
               dateAdd: getVal(cart.date_add)?.split(' ')[0] || '—',
               raw: cart,
             }

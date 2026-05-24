@@ -117,10 +117,21 @@ const OrdersList = () => {
                 <td className="price-cell">{order.totalTTC} €</td>
                 <td className="date-cell">{order.currency}</td>
                 <td>
-                  <span className="count-badge">
-                    <i className="ti ti-box" aria-hidden="true"></i>
-                    {order.productCount}
-                  </span>
+                  {order.products?.length > 0 ? (
+                    <div className="order-products-list">
+                      {order.products.map((p, i) => (
+                        <span key={i} className="order-product-item">
+                          <span className="order-product-qty">×{p.qty}</span>
+                          <span className="order-product-name">{p.name}</span>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="count-badge">
+                      <i className="ti ti-box" aria-hidden="true"></i>
+                      {order.productCount}
+                    </span>
+                  )}
                 </td>
 
                 <td>

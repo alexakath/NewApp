@@ -349,19 +349,19 @@ const ImportPage = () => {
         </div>
 
         {zipEntry && !globalReport && (
-          <div className="import-images-toggle" style={{ marginTop: '12px 0',padding: '10px', background: '#f8fafc', borderRadius: '6px',border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '8px', gap: '10px' }}>
-              <input
-                type="checkbox"
-                id="toggle-images"
-                checked={importImagesEnabled}
-                onChange={(e) => setImportImagesEnabled(e.target.checked)}
-                disabled={importing }
-                style={{width: '18px', height: '18px', cursor: 'pointer'}}
-              />
-              <label htmlFor="toggle-images" style={{fontWeight: '500', color: '#334155', cursor: 'pointer'}}>
-                Importer les images produits du ZIP
-              </label>
-            </div>
+          <div className="import-images-toggle">
+            <input
+              type="checkbox"
+              id="toggle-images"
+              checked={importImagesEnabled}
+              onChange={(e) => setImportImagesEnabled(e.target.checked)}
+              disabled={importing}
+              className="import-images-checkbox"
+            />
+            <label htmlFor="toggle-images" className="import-images-label">
+              Importer les images produits du ZIP
+            </label>
+          </div>
         )}
 
         {!importing && !globalReport && (

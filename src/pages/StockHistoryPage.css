@@ -50,7 +50,7 @@
 .back-btn i { font-size: 14px; }
 
 .back-btn:hover {
-  background: var(--bg-hover);
+  background: var(--bg-raised);
   color: var(--text-primary);
   border-color: #2a2d3a;
 }
@@ -254,7 +254,7 @@
   text-align: left;
   font-size: 10px;
   font-weight: 600;
-  color: var(--text-faint);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   border-bottom: 0.5px solid var(--border);
@@ -265,12 +265,12 @@
 .list-table td {
   padding: 11px 14px;
   color: var(--text-primary);
-  border-bottom: 0.5px solid var(--border-soft);
+  border-bottom: 0.5px solid var(--border);
   vertical-align: middle;
 }
 
 .list-table tbody tr:last-child td { border-bottom: none; }
-.list-table tbody tr:hover td      { background: var(--bg-hover); }
+.list-table tbody tr:hover td      { background: var(--bg-raised); }
 
 /* Colonne date */
 .date-cell {

@@ -210,7 +210,7 @@
   text-align: left;
   font-size: 10px;
   font-weight: 600;
-  color: var(--text-faint);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   border-bottom: 0.5px solid var(--border);
@@ -221,12 +221,12 @@
 .list-table td {
   padding: 10px 14px;
   color: var(--text-primary);
-  border-bottom: 0.5px solid var(--border-soft);
+  border-bottom: 0.5px solid var(--border);
   vertical-align: middle;
 }
 
 .list-table tbody tr:last-child td { border-bottom: none; }
-.list-table tbody tr:hover td      { background: var(--bg-hover); }
+.list-table tbody tr:hover td      { background: var(--bg-raised); }
 
 /* Miniature */
 .product-thumb {
@@ -311,7 +311,7 @@
 }
 
 .btn-history i { font-size: 13px; }
-.btn-history:hover { background: var(--bg-hover); color: var(--text-primary); }
+.btn-history:hover { background: var(--bg-raised); color: var(--text-primary); }
 
 .btn-add-stock {
   display: inline-flex;
@@ -331,7 +331,7 @@
 }
 
 .btn-add-stock i { font-size: 13px; }
-.btn-add-stock:hover { background: var(--accent-hover); }
+.btn-add-stock:hover { background: rgba(124,92,252,0.1); }
 
 /* Empty state */
 .empty-state {
@@ -371,7 +371,7 @@
   border-bottom: 0.5px solid var(--border);
   font-size: 10px;
   font-weight: 600;
-  color: var(--text-faint);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
@@ -389,7 +389,7 @@
 
 .stock-category-table th {
   background: var(--bg-base) !important;
-  color: var(--text-faint) !important;
+  color: var(--text-secondary) !important;
   font-size: 10px !important;
   padding: 8px 16px !important;
   border-bottom: 0.5px solid var(--border) !important;
@@ -397,7 +397,7 @@
 
 .stock-category-table td {
   padding: 9px 16px !important;
-  border-bottom: 0.5px solid var(--border-soft) !important;
+  border-bottom: 0.5px solid var(--border) !important;
   font-size: 12px;
 }
 
@@ -406,7 +406,7 @@
 }
 
 .stock-category-table tbody tr:hover td {
-  background: var(--bg-hover) !important;
+  background: var(--bg-raised) !important;
 }
 
 /* Ligne total */
@@ -478,7 +478,7 @@
 }
 
 .stock-modal-close:hover:not(:disabled) {
-  background: var(--bg-hover);
+  background: var(--bg-raised);
   color: var(--text-secondary);
 }
 
@@ -646,7 +646,7 @@
 }
 
 .btn-cancel:hover:not(:disabled) {
-  background: var(--bg-hover);
+  background: var(--bg-raised);
   color: var(--text-primary);
 }
 
@@ -666,6 +666,7 @@
   color: #fff;
   border: none;
   transition: opacity 0.15s;
+  box-shadow: 0 4px 14px rgba(124,92,252,0.25);
 }
 
 .btn-confirm:hover:not(:disabled) { opacity: 0.88; }

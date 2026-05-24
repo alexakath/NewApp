@@ -42,68 +42,88 @@ const FrontLoginPage = () => {
     <FrontLayout>
       <div className="front-login-wrapper">
         <div className="front-login-box">
-          <h2>Connexion</h2>
-          <p className="front-login-sub">
-            {emailFromParam
-              ? 'Entrez votre mot de passe pour continuer'
-              : 'Connectez-vous pour finaliser votre commande'}
-          </p>
 
-          {error && (
-            <div className="front-login-error">
-              <i className="ti ti-alert-circle"></i>
-              {error}
+          {/* ── Panel gauche : branding ── */}
+          <div className="front-login-brand">
+            <div className="front-login-brand-inner">
+              <div className="front-login-brand-icon">
+                <i className="ti ti-shopping-bag"></i>
+              </div>
+              <h2>Bon retour</h2>
+              <p>Accédez à votre espace client</p>
             </div>
-          )}
+            <span className="front-login-brand-name">Your'Shop</span>
+          </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="front-login-field">
-              <label>Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                readOnly={emailFromParam}
-                className={emailFromParam ? 'input-readonly' : ''}
-              />
-              {emailFromParam && (
-                <span className="front-login-email-hint">
-                  <i className="ti ti-lock-open"></i>
-                  Email pré-rempli depuis la sélection du compte
-                </span>
-              )}
+          {/* ── Panel droit : formulaire ── */}
+          <div className="front-login-form-panel">
+
+            <div className="front-login-form-header">
+              <h3>Connexion</h3>
+              <p className="front-login-sub">
+                {emailFromParam
+                  ? 'Entrez votre mot de passe pour continuer'
+                  : 'Connectez-vous pour finaliser votre commande'}
+              </p>
             </div>
 
-            <div className="front-login-field">
-              <label>Mot de passe</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                autoFocus={emailFromParam}
-                placeholder="Entrez votre mot de passe"
-              />
-            </div>
+            {error && (
+              <div className="front-login-error">
+                <i className="ti ti-alert-circle"></i>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <div className="front-login-field">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  readOnly={emailFromParam}
+                  className={emailFromParam ? 'input-readonly' : ''}
+                />
+                {emailFromParam && (
+                  <span className="front-login-email-hint">
+                    <i className="ti ti-lock-open"></i>
+                    Email pré-rempli depuis la sélection du compte
+                  </span>
+                )}
+              </div>
+
+              <div className="front-login-field">
+                <label>Mot de passe</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  autoFocus={emailFromParam}
+                  placeholder="Entrez votre mot de passe"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="front-login-btn"
+                disabled={loading}
+              >
+                {loading
+                  ? <><i className="ti ti-loader-2 spin"></i> Connexion...</>
+                  : 'Se connecter'}
+              </button>
+            </form>
 
             <button
-              type="submit"
-              className="front-login-btn"
-              disabled={loading}
+              className="front-login-back"
+              onClick={() => navigate('/shop')}
             >
-              {loading
-                ? <><i className="ti ti-loader-2 spin"></i> Connexion...</>
-                : 'Se connecter'}
+              ← Retour à la liste des comptes
             </button>
-          </form>
 
-          <button
-            className="front-login-back"
-            onClick={() => navigate('/shop')}
-          >
-            ← Retour à la liste des comptes
-          </button>
+          </div>
         </div>
       </div>
     </FrontLayout>

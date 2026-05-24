@@ -10,7 +10,7 @@ const getVal = (field) => {
   return String(field)
 }
 
-const getStockAvailableRecord = async (idProduct, idProductAttribute = 0) => {
+export const getStockAvailableRecord = async (idProduct, idProductAttribute = 0) => {
   const response = await axiosInstance.get(
     `/stock_availables?display=full&filter[id_product]=[${idProduct}]&filter[id_product_attribute]=[${idProductAttribute}]`
   )

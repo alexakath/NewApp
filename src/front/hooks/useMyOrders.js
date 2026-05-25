@@ -31,7 +31,7 @@ const useMyOrders = (customerId) => {
         setLoading(true)
         setError(null)
 
-        const [ordersRes, cartsRes, statesRes, currenciesRes, productsRes, taxesRes, taxRulesRes] = await Promise.all([
+        const [ordersRes, cartsRes, statesRes, currenciesRes, productsRes, taxesRes, taxRulesRes, orderDetailsRes] = await Promise.all([
           axiosInstance.get(`/orders?display=full&filter[id_customer]=[${customerId}]`),
           axiosInstance.get(`/carts?display=full&filter[id_customer]=[${customerId}]`),
           axiosInstance.get('/order_states?display=full'),
@@ -39,15 +39,17 @@ const useMyOrders = (customerId) => {
           axiosInstance.get('/products?display=full'),
           axiosInstance.get('/taxes?display=full'),
           axiosInstance.get('/tax_rules?display=full'),
+          axiosInstance.get(`/order_details?display=full&filter[id_order_invoice]=[0,99999]`),
         ])
 
-        const rawOrders      = toArray(parseXML(ordersRes.data)?.prestashop?.orders?.order)
-        const rawCarts       = toArray(parseXML(cartsRes.data)?.prestashop?.carts?.cart)
-        const rawOrderStates = toArray(parseXML(statesRes.data)?.prestashop?.order_states?.order_state)
-        const rawCurrencies  = toArray(parseXML(currenciesRes.data)?.prestashop?.currencies?.currency)
-        const rawProducts    = toArray(parseXML(productsRes.data)?.prestashop?.products?.product)
-        const rawTaxes       = toArray(parseXML(taxesRes.data)?.prestashop?.taxes?.tax)
-        const rawTaxRules    = toArray(parseXML(taxRulesRes.data)?.prestashop?.tax_rules?.tax_rule)
+        const rawOrders       = toArray(parseXML(ordersRes.data)?.prestashop?.orders?.order)
+        const rawCarts        = toArray(parseXML(cartsRes.data)?.prestashop?.carts?.cart)
+        const rawOrderStates  = toArray(parseXML(statesRes.data)?.prestashop?.order_states?.order_state)
+        const rawCurrencies   = toArray(parseXML(currenciesRes.data)?.prestashop?.currencies?.currency)
+        const rawProducts     = toArray(parseXML(productsRes.data)?.prestashop?.products?.product)
+        const rawTaxes        = toArray(parseXML(taxesRes.data)?.prestashop?.taxes?.tax)
+        const rawTaxRules     = toArray(parseXML(taxRulesRes.data)?.prestashop?.tax_rules?.tax_rule)
+        const rawOrderDetails = toArray(parseXML(orderDetailsRes.data)?.prestashop?.order_details?.order_detail)
 
         // Map taux de taxe réels
         const taxRateById = {}
@@ -88,12 +90,30 @@ const useMyOrders = (customerId) => {
 
         // Map prix produit : id → priceTTC avec taux réel par produit
         const productPriceMap = {}
+        const productNameMap  = {}
         rawProducts.forEach((p) => {
           const id      = String(getVal(p.id))
           const priceHT = parseFloat(getVal(p.price) || 0)
           const groupId = String(getVal(p.id_tax_rules_group))
           const taxRate = taxRateByGroup[groupId] || 0
           productPriceMap[id] = priceHT * (1 + taxRate / 100)
+          const lang = p.name?.language
+          productNameMap[id] = typeof lang === 'string'
+            ? lang
+            : (lang?.['#text'] != null ? String(lang['#text']) : null)
+              ?? (Array.isArray(lang) && lang[0]?.['#text'] != null ? String(lang[0]['#text']) : null)
+              ?? '—'
+        })
+
+        // Map produits par commande : id_order → [{name, qty}]
+        const productsByOrderMap = {}
+        rawOrderDetails.forEach((d) => {
+          const orderId = String(getVal(d.id_order))
+          if (!productsByOrderMap[orderId]) productsByOrderMap[orderId] = []
+          productsByOrderMap[orderId].push({
+            name: String(getVal(d.product_name) || '—'),
+            qty:  parseInt(getVal(d.product_quantity) || 1),
+          })
         })
 
         // Enrichir les commandes
@@ -112,6 +132,7 @@ const useMyOrders = (customerId) => {
             stateId,
             totalTTC:   totalTTC.toFixed(2),
             currency:   currencyMap[currencyId] || '—',
+            products:   productsByOrderMap[id] || [],
             dateAdd:    getVal(order.date_add)?.split(' ')[0] || '—',
           }
         })
@@ -167,6 +188,9 @@ const useMyOrders = (customerId) => {
               stateId:    'cart',
               totalTTC:   totalTTC.toFixed(2),
               currency:   currencyMap[currencyId] || '—',
+              products:   rows
+                .map(row => ({ name: productNameMap[String(getVal(row.id_product))] || '—', qty: parseInt(getVal(row.quantity) || 0) }))
+                .filter(p => p.qty > 0),
               dateAdd:    getVal(cart.date_add)?.split(' ')[0] || '—',
             }
           })

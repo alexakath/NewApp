@@ -3,8 +3,81 @@ import { useNavigate } from 'react-router-dom'
 import FrontLayout from '../FrontLayout'
 import { frontIsAuthenticated, frontGetCurrentUser } from '../services/frontAuthService'
 import useMyOrders from '../hooks/useMyOrders'
-import { duplicateOrderWithMultiplier } from '../../api/services/ordersService'
+import { prepareDuplicateCart } from '../../api/services/ordersService'
 import './MyOrdersPage.css'
+
+// ----------------------------------------------------------------------
+// SOUS-COMPOSANT : Le Popup (Modal) de Duplication
+// ----------------------------------------------------------------------
+const OrderDuplicationModal = ({ order, onClose, navigate }) => {
+  const [multiplier, setMultiplier] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  const handleActionSubmit = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      // Appel du service pour générer le panier PrestaShop
+      const newCart = await prepareDuplicateCart(order.id, multiplier)
+      
+      // Extraction de l'ID du panier (gestion du format XML parsé)
+      const newCartId = newCart?.id?.['#text'] || newCart?.id
+
+      if (!newCartId) throw new Error("Impossible de récupérer l'ID du nouveau panier")
+
+      // Fermeture et redirection immédiate avec le cartId en mémoire d'état
+      onClose()
+      navigate(`/shop/order-confirm/${newCartId}`, { state: { cartId: newCartId } })
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="modal-backdrop" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+      <div className="modal-box" style={{ background: '#fff', padding: '24px', borderRadius: '8px', maxWidth: '500px', width: '100%' }}>
+        <h2>Duplication — Réf. {order.reference} (ID #{order.id})</h2>
+        
+        {error && <div className="modal-error" style={{ color: 'red', margin: '10px 0' }}>⚠️ {error}</div>}
+
+        <div className="modal-products-preview" style={{ margin: '15px 0', background: '#f5f5f5', padding: '12px', borderRadius: '4px' }}>
+          <h3>Produits à dupliquer :</h3>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {order.products?.map((p, index) => (
+              <li key={index} style={{ marginBottom: '8px' }}>
+                📦 {p.name} : {p.qty} × {multiplier} = <strong>{p.qty * multiplier}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="modal-field" style={{ margin: '20px 0' }}>
+          <label style={{ marginRight: '10px' }}>Multiplicateur : </label>
+          <input 
+            type="number" 
+            min="1" 
+            value={multiplier} 
+            onChange={(e) => setMultiplier(Math.max(1, parseInt(e.target.value) || 1))}
+            disabled={loading}
+            style={{ width: '60px', padding: '4px' }}
+          />
+        </div>
+
+        <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          <button onClick={onClose} disabled={loading} className="btn-secondary">
+            Annuler
+          </button>
+          <button onClick={handleActionSubmit} disabled={loading} className="btn-primary" style={{ backgroundColor: '#007bff', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}>
+            {loading ? 'Création du panier...' : 'Ajouter au panier'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const MyOrdersPage = () => {
   const navigate = useNavigate()
@@ -30,87 +103,24 @@ const MyOrdersPage = () => {
 }
 
 const MyOrdersContent = ({ user, navigate }) => {
-  const { orders, loading, error, refreshOrders } = useMyOrders(user?.id)
+  const { orders, loading, error } = useMyOrders(user?.id)
   
-  // États locaux pour l'actionneur de duplication
-  const [multipliers, setMultipliers] = useState({}) 
-  const [processingId, setProcessingId] = useState(null) 
-  const [actionMessage, setActionMessage] = useState({ text: '', isError: false })
+  // État pour la commande sélectionnée dans le popup (null = popup fermé)
+  const [selectedOrderForDuplication, setSelectedOrderForDuplication] = useState(null)
 
-  if (loading) {
-    return (
-      <div className="my-orders-status">
-        <i className="ti ti-loader-2 spin"></i>
-        Chargement de vos commandes...
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="my-orders-status my-orders-error">
-        <i className="ti ti-alert-circle"></i>
-        Erreur : {error}
-      </div>
-    )
-  }
-
-  const handleMultiplierChange = (orderId, val) => {
-    const num = Math.max(1, Math.min(100, parseInt(val, 10) || 1))
-    setMultipliers(prev => ({ ...prev, [orderId]: num }))
-  }
-
-  const handleReorder = async (orderId) => {
-    const coeff = multipliers[orderId] || 1
-    setProcessingId(orderId)
-    setActionMessage({ text: '', isError: false })
-
-    try {
-      const newId = await duplicateOrderWithMultiplier(orderId, coeff)
-      setActionMessage({ 
-        text: `Succès ! La commande #${orderId} a été clonée. Nouvelle commande : #${newId}`, 
-        isError: false 
-      })
-      
-      if (typeof refreshOrders === 'function') {
-        refreshOrders()
-      } else {
-        setTimeout(() => window.location.reload(), 2000)
-      }
-    } catch (err) {
-      setActionMessage({ 
-        text: `Échec du clonage : ${err.message}`, 
-        isError: true 
-      })
-    } finally {
-      setProcessingId(null)
-    }
-  }
+  if (loading) return <div className="my-orders-status"><i className="ti ti-loader-2 spin"></i> Chargement...</div>
+  if (error) return <div className="my-orders-status my-orders-error">Erreur : {error}</div>
 
   return (
     <div className="my-orders-wrapper">
       <div className="my-orders-header">
         <h1 className="my-orders-title">Mes commandes</h1>
-        {!loading && (
-          <span className="my-orders-count">
-            {orders.length} commande{orders.length !== 1 ? 's' : ''}
-          </span>
-        )}
+        <span className="my-orders-count">{orders.length} commande{orders.length !== 1 ? 's' : ''}</span>
       </div>
-
-      {/* Message de Notification Dynamique */}
-      {actionMessage.text && (
-        <div className={`action-msg ${actionMessage.isError ? 'action-msg-error' : 'action-msg-success'}`}>
-          <i className={`ti ${actionMessage.isError ? 'ti-circle-x' : 'ti-circle-check'}`}></i>
-          <span>{actionMessage.text}</span>
-        </div>
-      )}
 
       {orders.length === 0 ? (
         <div className="my-orders-empty">
-          <i className="ti ti-clipboard-list"></i>
           <p>Vous n'avez pas encore de commande.</p>
-          <button onClick={() => navigate('/shop/products')}>Découvrir nos produits</button>
         </div>
       ) : (
         <div className="my-orders-table-wrap">
@@ -119,87 +129,42 @@ const MyOrdersContent = ({ user, navigate }) => {
               <tr>
                 <th>Référence</th>
                 <th>État</th>
+                <th>Produits</th>
                 <th>Total TTC</th>
                 <th>Date</th>
-                <th style={{ textAlign: 'right' }}>Actions / Multiplicateur</th>
+                <th style={{ textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((item) => {
-                const currentCoeff = multipliers[item.id] || 1
-                const isCurrentProcessing = processingId === item.id
-                const isCart = item.type === 'cart' || (item.state || '').toLowerCase() === 'dans le panier'
+                const stateClean = (item.state || '').toLowerCase().trim()
+                
+                // RÈGLE : Uniquement disponible pour "paiement effectué" et "livré"
+                const canDuplicate = stateClean === 'paiement accepté' || stateClean === 'livré'
 
                 return (
                   <tr key={item.id}>
-                    <td className="my-orders-ref">
-                      {item.reference !== '—'
-                        ? <strong>{item.reference}</strong>
-                        : <span className="my-orders-dash">—</span>
-                      }
-                    </td>
+                    <td className="my-orders-ref"><strong>{item.reference}</strong></td>
                     <td>
-                      <span
-                        className="my-orders-badge"
-                        style={{
-                          background: `${item.stateColor}22`,
-                          color:      item.stateColor,
-                          border:     `0.5px solid ${item.stateColor}55`,
-                        }}
-                      >
+                      <span className="my-orders-badge" style={{ background: `${item.stateColor}22`, color: item.stateColor }}>
                         {item.state}
                       </span>
                     </td>
-                    <td className="my-orders-total">
-                      {item.totalTTC !== '0.00' ? `${item.totalTTC} €` : '—'}
+                    <td className="my-orders-products">
+                      {item.products?.map((p, i) => (
+                        <div key={i}>×{p.qty} {p.name}</div>
+                      ))}
                     </td>
+                    <td className="my-orders-total">{item.totalTTC} €</td>
                     <td className="my-orders-date">{item.dateAdd}</td>
-                    
-                    {/* Actions alignées à droite */}
-                    <td className="my-orders-actions-cell">
-                      {isCart ? (
-                        <button
+                    <td style={{ textAlign: 'right' }}>
+                      {canDuplicate && (
+                        <button 
                           className="my-orders-action-btn"
-                          onClick={() => navigate('/shop/cart')}
+                          onClick={() => setSelectedOrderForDuplication(item)}
                         >
-                          <i className="ti ti-shopping-cart"></i>
-                          Finaliser
+                          <i className="ti ti-copy"></i> +commander
                         </button>
-                      ) : (
-                        <div className="my-orders-actions-inner">
-                          {/* Sélecteur de quantité */}
-                          <div className="my-orders-multiplier">
-                            <span className="my-orders-multiplier-x">x</span>
-                            <input
-                              type="number"
-                              min="1"
-                              max="100"
-                              value={currentCoeff}
-                              onChange={(e) => handleMultiplierChange(item.id, e.target.value)}
-                              disabled={!!processingId}
-                              className="my-orders-multiplier-input"
-                            />
-                          </div>
-
-                          {/* Bouton d'action */}
-                          <button
-                            className={`my-orders-action-btn my-orders-reorder-btn${processingId ? ' processing' : ''}`}
-                            disabled={!!processingId}
-                            onClick={() => handleReorder(item.id)}
-                          >
-                            {isCurrentProcessing ? (
-                              <>
-                                <i className="ti ti-loader-2 spin"></i>
-                                Vérification...
-                              </>
-                            ) : (
-                              <>
-                                <i className="ti ti-copy"></i>
-                                Recommander
-                              </>
-                            )}
-                          </button>
-                        </div>
                       )}
                     </td>
                   </tr>
@@ -208,6 +173,15 @@ const MyOrdersContent = ({ user, navigate }) => {
             </tbody>
           </table>
         </div>
+      )}
+
+      {/* Rendu conditionnel du Popup */}
+      {selectedOrderForDuplication && (
+        <OrderDuplicationModal 
+          order={selectedOrderForDuplication} 
+          onClose={() => setSelectedOrderForDuplication(null)} 
+          navigate={navigate}
+        />
       )}
     </div>
   )

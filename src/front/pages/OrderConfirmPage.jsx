@@ -48,7 +48,15 @@ const OrderConfirmPage = () => {
     runStockCheck()
   }, [cartId])
 
-  // 4️⃣ Action du clic sur "Confirmer la commande"
+  // 4️⃣ Annulation de la duplication → supprime le panier créé
+  const handleCancel = async () => {
+    if (cartId) {
+      try { await deleteCart(cartId) } catch { /* ignore */ }
+    }
+    navigate('/shop/my-orders')
+  }
+
+  // 5️⃣ Action du clic sur "Confirmer la commande"
   const handleFinalizeOrder = async () => {
     if (!cartItem) return
     setIsSubmitting(true)
@@ -143,7 +151,7 @@ const OrderConfirmPage = () => {
                     >
                       {issubmitting ? 'Création...' : '🛒 Confirmer la commande'}
                     </button>
-                    <button className="confirm-btn-secondary" onClick={() => navigate('/shop/my-orders')} disabled={issubmitting}>
+                    <button className="confirm-btn-secondary" onClick={handleCancel} disabled={issubmitting}>
                       Annuler
                     </button>
                   </div>

@@ -37,40 +37,42 @@ const OrderDuplicationModal = ({ order, onClose, navigate }) => {
   }
 
   return (
-    <div className="modal-backdrop" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-      <div className="modal-box" style={{ background: '#fff', padding: '24px', borderRadius: '8px', maxWidth: '500px', width: '100%' }}>
-        <h2>Duplication — Réf. {order.reference} (ID #{order.id})</h2>
-        
-        {error && <div className="modal-error" style={{ color: 'red', margin: '10px 0' }}>⚠️ {error}</div>}
+    <div className="dup-modal-backdrop">
+      <div className="dup-modal-box">
+        <h2 className="dup-modal-title">Duplication — Réf. {order.reference} (ID #{order.id})</h2>
 
-        <div className="modal-products-preview" style={{ margin: '15px 0', background: '#f5f5f5', padding: '12px', borderRadius: '4px' }}>
-          <h3>Produits à dupliquer :</h3>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
+        {error && <div className="dup-modal-error"><i className="ti ti-alert-circle"></i> {error}</div>}
+
+        <div className="dup-modal-products">
+          <h3>Produits à dupliquer</h3>
+          <ul>
             {order.products?.map((p, index) => (
-              <li key={index} style={{ marginBottom: '8px' }}>
-                📦 {p.name} : {p.qty} × {multiplier} = <strong>{p.qty * multiplier}</strong>
+              <li key={index}>
+                <span className="mo-product-qty">×{p.qty}</span>
+                <span className="mo-product-name">{p.name}</span>
+                <span className="dup-modal-result">→ ×{p.qty * multiplier}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="modal-field" style={{ margin: '20px 0' }}>
-          <label style={{ marginRight: '10px' }}>Multiplicateur : </label>
-          <input 
-            type="number" 
-            min="1" 
-            value={multiplier} 
+        <div className="dup-modal-field">
+          <label>Multiplicateur :</label>
+          <input
+            type="number"
+            min="1"
+            value={multiplier}
             onChange={(e) => setMultiplier(Math.max(1, parseInt(e.target.value) || 1))}
             disabled={loading}
-            style={{ width: '60px', padding: '4px' }}
+            className="dup-modal-multiplier-input"
           />
         </div>
 
-        <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-          <button onClick={onClose} disabled={loading} className="btn-secondary">
+        <div className="dup-modal-actions">
+          <button onClick={onClose} disabled={loading} className="dup-modal-btn-cancel">
             Annuler
           </button>
-          <button onClick={handleActionSubmit} disabled={loading} className="btn-primary" style={{ backgroundColor: '#007bff', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}>
+          <button onClick={handleActionSubmit} disabled={loading} className="dup-modal-btn-submit">
             {loading ? 'Création du panier...' : 'Ajouter au panier'}
           </button>
         </div>

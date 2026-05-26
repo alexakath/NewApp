@@ -2,7 +2,10 @@ import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import FrontLayout from '../FrontLayout'
 import useEnrichedProducts from '../../hooks/useEnrichedProducts'
+import { removeStockByCategory } from '../../api/services/stockMovementService'
 import './ShopPage.css'
+
+const ADMIN_PWD = import.meta.env.VITE_ADMIN_PASSWORD
 
 const ShopPage = () => {
   const { products, loading, error } = useEnrichedProducts()
@@ -12,11 +15,40 @@ const ShopPage = () => {
   const [priceMin, setPriceMin]     = useState('')
   const [priceMax, setPriceMax]     = useState('')
 
+  // Remove stock flow: null | 'pwd' | 'form' | 'result'
+  const [step, setStep]             = useState(null)
+  const [pwd, setPwd]               = useState('')
+  const [pwdError, setPwdError]     = useState('')
+  const [selectedCat, setSelectedCat] = useState('')
+  const [qtyInput, setQtyInput]     = useState('')
+  const [removing, setRemoving]     = useState(false)
+  const [removeError, setRemoveError] = useState('')
+  const [result, setResult]         = useState(null)
+
   const activeProducts = products.filter(p => p.active == 1)
 
   const categories = useMemo(() => {
     const all = activeProducts.map(p => p.categoryDefault).filter(Boolean)
     return [...new Set(all)].sort()
+  }, [activeProducts])
+
+  // category name → { name, productIds[] }
+  const categoryMap = useMemo(() => {
+    const map = {}
+    activeProducts.forEach(p => {
+      const name = p.categoryDefault
+      if (!name) return
+      if (!map[name]) map[name] = { name, productIds: [] }
+      map[name].productIds.push(String(p.id))
+    })
+    return map
+  }, [activeProducts])
+
+  // productId → productName (pour l'affichage dans le résultat)
+  const productNameMap = useMemo(() => {
+    const map = {}
+    activeProducts.forEach(p => { map[String(p.id)] = p.name })
+    return map
   }, [activeProducts])
 
   const filtered = useMemo(() => {
@@ -40,6 +72,61 @@ const ShopPage = () => {
     setPriceMax('')
   }
 
+  // ── Remove stock handlers ──
+
+  const openPwdModal = () => {
+    setPwd('')
+    setPwdError('')
+    setStep('pwd')
+  }
+
+  const closeAll = () => {
+    setStep(null)
+    setPwd('')
+    setPwdError('')
+    setSelectedCat('')
+    setQtyInput('')
+    setRemoveError('')
+    setResult(null)
+  }
+
+  const handlePwdSubmit = () => {
+    if (pwd !== ADMIN_PWD) {
+      setPwdError('Mot de passe incorrect.')
+      return
+    }
+    const firstCat = Object.keys(categoryMap)[0] || ''
+    setSelectedCat(firstCat)
+    setQtyInput('')
+    setRemoveError('')
+    setStep('form')
+  }
+
+  const handleRemoveSubmit = async () => {
+    const qty = parseInt(qtyInput)
+    if (!qty || qty <= 0) {
+      setRemoveError('Saisir une quantité valide (> 0).')
+      return
+    }
+    const catData = categoryMap[selectedCat]
+    if (!catData) {
+      setRemoveError('Catégorie invalide.')
+      return
+    }
+    setRemoving(true)
+    setRemoveError('')
+    try {
+      const { totalReduced, initialTotal, totalShouldRemove, remainingTotal, details } =
+        await removeStockByCategory(catData.productIds, qty, productNameMap)
+      setResult({ categoryName: catData.name, qtyAsked: qty, totalReduced, initialTotal, totalShouldRemove, remainingTotal, details })
+      setStep('result')
+    } catch (err) {
+      setRemoveError(err.message || 'Erreur lors de la suppression de stock.')
+    } finally {
+      setRemoving(false)
+    }
+  }
+
   return (
     <FrontLayout>
       <div className="shop-header">
@@ -49,6 +136,9 @@ const ShopPage = () => {
             {filtered.length} produit{filtered.length !== 1 ? 's' : ''}
           </span>
         )}
+        <button className="btn-remove-stock" onClick={openPwdModal}>
+          <i className="ti ti-trash"></i>Remove stock
+        </button>
       </div>
 
       {!loading && !error && (
@@ -175,6 +265,176 @@ const ShopPage = () => {
           </Link>
         ))}
       </div>
+
+      {/* ── Modal 1 : Mot de passe ── */}
+      {step === 'pwd' && (
+        <div className="rs-overlay" onClick={closeAll}>
+          <div className="rs-modal" onClick={e => e.stopPropagation()}>
+            <div className="rs-modal-header">
+              <h3><i className="ti ti-lock"></i>Mot de passe administrateur</h3>
+              <button className="rs-close" onClick={closeAll}><i className="ti ti-x"></i></button>
+            </div>
+            <div className="rs-modal-body">
+              <input
+                type="password"
+                className="rs-input"
+                placeholder="Mot de passe"
+                value={pwd}
+                onChange={e => { setPwd(e.target.value); setPwdError('') }}
+                onKeyDown={e => e.key === 'Enter' && handlePwdSubmit()}
+                autoFocus
+              />
+              {pwdError && (
+                <p className="rs-error">
+                  <i className="ti ti-alert-circle"></i>{pwdError}
+                </p>
+              )}
+            </div>
+            <div className="rs-modal-footer">
+              <button className="rs-btn-cancel" onClick={closeAll}>Annuler</button>
+              <button className="rs-btn-confirm" onClick={handlePwdSubmit} disabled={!pwd}>
+                <i className="ti ti-arrow-right"></i>Continuer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal 2 : Formulaire suppression ── */}
+      {step === 'form' && (
+        <div className="rs-overlay" onClick={!removing ? closeAll : undefined}>
+          <div className="rs-modal" onClick={e => e.stopPropagation()}>
+            <div className="rs-modal-header">
+              <h3><i className="ti ti-minus"></i>Supprimer du stock</h3>
+              <button className="rs-close" onClick={closeAll} disabled={removing}>
+                <i className="ti ti-x"></i>
+              </button>
+            </div>
+            <div className="rs-modal-body">
+              <div className="rs-field">
+                <label>Catégorie</label>
+                <select
+                  className="rs-input rs-select"
+                  value={selectedCat}
+                  onChange={e => setSelectedCat(e.target.value)}
+                  disabled={removing}
+                >
+                  {Object.values(categoryMap).map(cat => (
+                    <option key={cat.name} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="rs-field">
+                <label>Quantité à supprimer</label>
+                <input
+                  type="number"
+                  min="1"
+                  className="rs-input"
+                  placeholder="0"
+                  value={qtyInput}
+                  onChange={e => { setQtyInput(e.target.value); setRemoveError('') }}
+                  disabled={removing}
+                />
+              </div>
+              {removeError && (
+                <p className="rs-error">
+                  <i className="ti ti-alert-circle"></i>{removeError}
+                </p>
+              )}
+            </div>
+            <div className="rs-modal-footer">
+              <button className="rs-btn-cancel" onClick={closeAll} disabled={removing}>
+                Annuler
+              </button>
+              <button
+                className="rs-btn-danger"
+                onClick={handleRemoveSubmit}
+                disabled={removing || !qtyInput || parseInt(qtyInput) <= 0}
+              >
+                {removing
+                  ? <><i className="ti ti-loader rs-spin"></i>Traitement…</>
+                  : <><i className="ti ti-check"></i>Valider</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal 3 : Résultat ── */}
+      {step === 'result' && result && (
+        <div className="rs-overlay" onClick={closeAll}>
+          <div className="rs-modal rs-modal--wide" onClick={e => e.stopPropagation()}>
+            <div className="rs-modal-header">
+              <h3><i className="ti ti-circle-check"></i>Stock mis à jour — {result.categoryName}</h3>
+              <button className="rs-close" onClick={closeAll}><i className="ti ti-x"></i></button>
+            </div>
+            <div className="rs-modal-body">
+
+              {/* Résumé */}
+              <div className="rs-summary-grid">
+                <div className="rs-summary-item">
+                  <span className="rs-summary-label">Qté initiale</span>
+                  <span className="rs-summary-value">{result.initialTotal}</span>
+                </div>
+                <div className="rs-summary-item">
+                  <span className="rs-summary-label">Qté insérée</span>
+                  <span className="rs-summary-value">{result.qtyAsked}</span>
+                </div>
+                <div className="rs-summary-item">
+                  <span className="rs-summary-label">Devait être enlevée</span>
+                  <span className="rs-summary-value">{result.totalShouldRemove}</span>
+                </div>
+                <div className="rs-summary-item rs-summary-item--removed">
+                  <span className="rs-summary-label">Réellement enlevée</span>
+                  <span className="rs-summary-value">{result.totalReduced}</span>
+                </div>
+                <div className="rs-summary-item rs-summary-item--remaining">
+                  <span className="rs-summary-label">Stock restant</span>
+                  <span className="rs-summary-value">{result.remainingTotal}</span>
+                </div>
+              </div>
+
+              {/* Détail par produit / déclinaison */}
+              <div className="rs-result-scroll">
+                <table className="rs-result-table">
+                  <thead>
+                    <tr>
+                      <th>Produit</th>
+                      <th>Déclinaison</th>
+                      <th>Qté demandée</th>
+                      <th>Qté retirée</th>
+                      <th>Stock restant</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.details.map((d, i) => (
+                      <tr key={i}>
+                        <td>{d.productName}</td>
+                        <td>{d.combinationRef ?? <span className="rs-muted">—</span>}</td>
+                        <td>{d.qtyRequested}</td>
+                        <td>
+                          <span className={d.qtyRemoved < d.qtyRequested ? 'rs-qty-partial' : 'rs-qty-full'}>
+                            {d.qtyRemoved}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={d.remainingQty <= 0 ? 'rs-qty-zero' : ''}>
+                            {d.remainingQty}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+            <div className="rs-modal-footer">
+              <button className="rs-btn-confirm" onClick={closeAll}>Fermer</button>
+            </div>
+          </div>
+        </div>
+      )}
     </FrontLayout>
   )
 }

@@ -12,6 +12,7 @@ const StockEntryPage = () => {
 
   const [search, setSearch] = useState('')
   const [onlyOutOfStock, setOnlyOutOfStock] = useState(false)
+  const [filterCat, setFilterCat] = useState('')
   const [modal, setModal] = useState(null)
   const [quantity, setQuantity] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -31,6 +32,12 @@ const StockEntryPage = () => {
     products.forEach(p => { map[String(p.id)] = p.categoryDefault || '—' })
     return map
   }, [products])
+
+  // Liste triée des catégories présentes dans le stock
+  const stockCategories = useMemo(() => {
+    const names = Object.values(productCatMap).filter(Boolean)
+    return [...new Set(names)].sort()
+  }, [productCatMap])
 
   // Tableau par catégorie
   // - availableQty : on prend availableQty depuis la ligne attr=0 (dédupliqué par produit)
@@ -70,6 +77,7 @@ const StockEntryPage = () => {
     const q = search.trim().toLowerCase()
     return stock.filter(s => {
       if (onlyOutOfStock && !s.outOfStock) return false
+      if (filterCat && productCatMap[s.productId] !== filterCat) return false
       if (!q) return true
       return (
         s.productName.toLowerCase().includes(q) ||
@@ -77,7 +85,7 @@ const StockEntryPage = () => {
         (s.combinationRef || '').toLowerCase().includes(q)
       )
     })
-  }, [stock, search, onlyOutOfStock])
+  }, [stock, search, onlyOutOfStock, filterCat, productCatMap])
 
   const [overrides, setOverrides] = useState({})
 
@@ -151,6 +159,16 @@ const StockEntryPage = () => {
             </button>
           )}
         </div>
+        <select
+          className="stock-cat-filter"
+          value={filterCat}
+          onChange={e => setFilterCat(e.target.value)}
+        >
+          <option value="">Toutes les catégories</option>
+          {stockCategories.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
         <label className="stock-toggle">
           <input
             type="checkbox"
